@@ -4,13 +4,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import requests
 from datetime import date
-from serpapi import GoogleSearch
 mysql = MySQL()
 
 app = Flask(__name__)
  
 # MySQL configurations
-API_KEY='92536bc787b6dca1777c13fbb645e766'
 app.config['MYSQL_USER'] = 'jschlehr'
 app.config['MYSQL_PASSWORD'] = 'notr3dam3'
 app.config['MYSQL_DB'] = 'jschlehr'
@@ -32,20 +30,29 @@ def login_required(f):
 
 @app.route("/")
 def main():
-    users = get_users()
-    return render_template('index.html', users=users)
+    teams = get_teams()
+
+    return render_template('index.html', teams=teams)
 
  
+@app.route("/team-rankings")
+def rankings():
+    teams = get_teams()
+    return render_template( 'rankings.html', teams=teams )
+
+@app.route("/team/<team_name>")
+def team_profile(team_name):
+    team = team_name
+    return render_template( 'team.html', team=team)
+
 @app.route("/feed")
 @login_required
 def feed():
+    games = get_games()
     bets = get_bets()
     comments = get_comments()
-    return render_template( 'feed.html', bets=bets, comments=comments)
+    return render_template( 'feed.html', bets=bets, comments=comments, games=games)
 
-@app.route("/features")
-def features():
-    return render_template('features.html')
 
 
 @app.route('/sign-up', methods=['POST','GET'])
@@ -75,7 +82,7 @@ def signUp():
             curr.execute( "SELECT * FROM users WHERE user_id = @@Identity" )
             data = curr.fetchall()
             session['user_id'] = data[0][0]
-            return render_template('account.html',account_name=session['user_name'],  message={"status":"success", "message":"Account Successfully made!"}, wins=get_wins(session['user_name']) )
+            return render_template('account.html',account_name=session['user_name'],  message={"status":"success", "message":"Account Successfully made!"} )
         else:
             return render_template('signup.html', message={"status":"error", "message":"an error was encountered, try again"} )
 
@@ -100,38 +107,9 @@ def view_profile(username):
     data = curr.fetchall()
     num_followers=0
     num_following=0
-    return render_template('profile.html', account_name=username, \
-            num_followers=num_followers, num_following=num_following, friends=get_friends(username),\
-            wins=get_wins(username))
+    return render_template('profile.html')
 
 
-@app.route( "/add-friend/<username>", methods=['POST','GET'])
-@login_required
-def add_friend(username):
-    
-    conn = mysql.connection
-    curr = conn.cursor()
-    #query = "select user_id from users where user_username=\"{username}\"".format(username=username)
-    curr.execute("SELECT user_id FROM users WHERE user_username=%(username)s", {'username': username}) #injection protected
-    data = curr.fetchall()
-    try:
-        friend_id = int(data[0][0])
-    except Exception as e:
-        print(e)
-        return 
-    #query = "INSERT IGNORE INTO friends values ( {user_id}, {friend_id} )".format( user_id=int(session['user_id']), friend_id=int(friend_id) )
-    #print( query )
-    user_id=int(session['user_id'])
-    friend_id=int(friend_id)
-    curr.execute("INSERT IGNORE INTO friends values (%s, %s)",(user_id,friend_id))
-    conn.commit()
-    if request.method == "GET":
-        url = "/profile/{}".format(username)
-        return view_profile(username)
-    elif request.method == "POST":
-        return {'status':'success'}
-    return {'status':'error'}
-    
     
 
 
@@ -155,13 +133,16 @@ def login():
                 return render_template('login.html', message={"status":"error", "message":"Incorrect username or password"})
             # TODO: case where query returns more than one result
             # refactor to make more robust
-            query_password = data[0][2]
+            query_password = data[0][1]
+            print(data)
+            print( query_password )
             # TODO fix so that the returns are better
+            
             if check_password_hash(query_password, _password):
                 session['logged_in'] = True
                 session['user_id'] = data[0][0]
                 session['user_name'] = _username
-                return render_template('account.html', message={"status":"success", "message":"Logged In!"},wins=get_wins(session['user_name']))
+                return render_template('account.html', message={"status":"success", "message":"Logged In!"} )
             return render_template('login.html', message={"status":"error", "message":"Incorrect username or password"})
 
 
@@ -244,7 +225,6 @@ def get_users():
     curr = conn.cursor()
     curr.execute("SELECT user_username FROM users" )
     data = curr.fetchall()
-    print(data)
     return data
 
 # trying to make join to get if already friends or not
@@ -260,20 +240,21 @@ def get_bets():
     data = curr.fetchall()
     data = list(data)
     for index, bet in enumerate( data ):
-        id = str(bet[5])
-        league = str(bet[7])
-        curr.execute("Select * FROM " + league + " where id=\"" + id + "\"" )
-        teams = curr.fetchall()[0]
-        data[index] = list(data[index]) + list(teams)
+        game_id = str(bet[8])
+        query = "Select home_team, away_team FROM games where id= {game_id}".format(game_id=game_id)
+        curr.execute( query )
+        teams = curr.fetchall()
+        data[index] = list(data[index]) + list(teams[0])
+        winner_id = str(bet[7])
+        query = "Select team_name FROM teams where team_id= {winner_id}".format(winner_id=winner_id)
+        curr.execute( query )
+        teams = curr.fetchall()
+        print(teams)
+        data[index] = list(data[index]) + list(teams[0])
+        print(data[index])
     return data
 
-def get_bets2():
-    conn = mysql.connection
-    curr = conn.cursor()
-    curr.execute("SELECT users.user_username, users.user_id, amount, type, league FROM bets, users WHERE bets.user_id = users.user_id")
-    data = curr.fetchall()
-    print(data)
-    return data
+
 
 def get_comments():
     conn = mysql.connection
@@ -283,21 +264,74 @@ def get_comments():
     data = list(data)
     return data
 
-def get_friends(uname):
+
+
+def get_teams():
     conn = mysql.connection
     curr = conn.cursor()
-    curr.execute("SELECT user_username from users,(SELECT friends.friend_id FROM friends, users WHERE friends.user_id = users.user_id AND friends.user_id <> friends.friend_id AND users.user_username =\"" + uname + "\")a WHERE users.user_id=a.friend_id" )
+    curr.execute( "Select team_name, wins, losses, PF, PA from teams order by wins DESC, PF DESC" )
     data = curr.fetchall()
-    print(data)
     return data
 
-def get_wins(uname):
+
+def update_standings():
     conn = mysql.connection
     curr = conn.cursor()
-    curr.execute("SELECT sum(b.n),sum(b.n)/sum(a.n) as winpct, sum(a.n)-sum(b.n) as losses FROM (select count(*) as n, win from bets where user_username=%s AND win=0 OR win=1 group by win)a, (select count(*) as n, win from bets where user_username=%s AND win=1 group by win)b",(uname,uname))
-    data = curr.fetchall()
-    print(data)
-    return data
+    curr.execute( "update teams, \
+     ( select count( loser_id ) as losses, loser_id  from ( Select home_score, away_score, home_team_id,away_team_id, \ if(  home_score<away_score, home_team_id, away_team_id ) as loser_id from games where home_score != 0 or \
+     away_score != 0 ) loss group by loser_id ) lossers \
+    set teams.losses=lossers.losses \
+    where teams.team_id=lossers.loser_id" )
+
+
+    '''
+    ---------------QUERY to update the number of losses ---------------------------------------------------------
+    update teams, 
+     ( select count( loser_id ) as losses, loser_id  from ( Select home_score, away_score, home_team_id,  away_team_id, if(  home_score<away_score, home_team_id, away_team_id ) as loser_id from games where home_score != 0 or away_score != 0 ) loss group by loser_id ) lossers
+    set teams.losses=lossers.losses
+    where teams.team_id=lossers.loser_id
+
+
+    ---------------query to update the number of wins---------------------------------------------------------
+    update teams,
+    ( select count( winner_id ) as wins, winner_id  from ( Select home_score, away_score, home_team_id,  away_team_id, if(  home_score>away_score, home_team_id, away_team_id ) as winner_id from games where home_score != 0 or away_score != 0 ) win group by winner_id ) winners
+    set teams.wins=winners.wins
+    where teams.team_id=winners.winner_id
+
+    -------------------Query to update PF--------------------------------------------------------------
+    update teams, 
+    ( select sum(PF) as PF, team_id from 
+    ( select sum( away_score ) as PF, away_team_id as team_id from games group by away_team_id 
+    union
+    select sum( home_score ) as PF, home_team_id as team_id from games group by home_team_id ) h
+    group by  team_id ) PF
+    set teams.PF=PF.PF
+    where teams.team_id=PF.team_id
+
+
+    
+    
+
+    
+
+    -------------------Query to update PA--------------------------------------------------------------
+
+    update teams,
+    ( select sum(PA) as PA, team_id from 
+    ( select sum( away_score ) as PA, home_team_id as team_id from games group by home_team_id 
+    union
+    select sum( home_score ) as PA, away_team_id as team_id from games group by away_team_id ) h
+    group by  team_id ) PA
+    set teams.PA=PA.PA
+    where teams.team_id=PA.team_id
+
+
+    '''
+
+    
+    
+
+    
 
 
 def get_num_followers( username ):
@@ -307,92 +341,56 @@ def get_num_followers( username ):
 
 
 
-@app.route( '/new-bet', methods=['GET', 'POST'])
+@app.route( '/new-bet', methods=[ 'POST'])
 @login_required
 def bet():
-    # TODO fill in information about the bet
-    if request.method=='GET':
-        return render_template( 'new-bet.html')
-    elif request.method=='POST':
-        _bet_amount = int( request.form['betAmount'] )
-        _bet_league = request.form['league']
-        _game_id = request.form['game']
-        _OU      = request.form['OU']
-        if _OU == 'over':
-            _OU = 1
-        else:
-            _OU = 0
-        _type = "OU"
-        if _bet_amount and _bet_league and _game_id:
-            conn = mysql.connection
-            curr = conn.cursor()
-            print(session["user_name"])
-            query = "INSERT INTO bets (amount, submitted_date, user_id, type, game_id, ou, league, user_username) \
-                          VALUES ({_bet_amount}, NOW(), {user_id}, \"{_type}\", \"{_game_id}\", \"{_OU}\", \"{_bet_league}\", \"{user_username}\")".format( _bet_amount=_bet_amount,  date=str(date.today()), user_id=int(session['user_id']),_type=_type, _game_id=_game_id,_OU=int(_OU), _bet_league=_bet_league,user_username=session["user_name"] )
-            print(query)
-            curr.execute( query )
-            conn.commit()
-            return redirect( "feed" )
-        else:
-            return {'status':'fail'}
+    
+    bet_amount = int( request.form['betAmount'] )
+    game_id = request.form['moneyline'].split(",")
+    print(game_id)
+
+    home_away = game_id[0]
+    print(game_id[1].strip())
+    winner_id = int(game_id[2].strip())
+
+    game_id = int(game_id[1].strip())
+    print(game_id)
 
 
-def get_odds(league):
-    print('Making Request')
-    try:
-        URL = 'https://api.the-odds-api.com/v4/sports/{league}/odds'.format(league=league)
-        print( URL )
-        response = requests.get( URL, params = 
-            { 'api_key':API_KEY, 
-            'markets':'totals',
-            'regions':'us' } )
-        if response.status_code != 200:
-            return {'error': 'API FAILED'}
-        return response.json()
-    except Exception as e:
-        return False
 
-def insert_games( league, games, bet_type ):
-    print("Traversing games")
-    for game in games:
-        id = game['id']
-        home_team = game['home_team']
-        away_team = game['away_team']
-        date = game['commence_time']
-        hours = date[:10]
-        minutes = date[12:-1]
-        date = hours 
-        OU = None
-        for bookmakers in game['bookmakers']:
-            if bookmakers['key'] == 'draftkings':
-                if bet_type == 'OU':
-                    OU = bookmakers['markets'][0]['outcomes'][0]['point']
-        
-        if not ( home_team and away_team and date and hours and minutes and date and OU ):
-            print("Error can't find metrics ")
-            return 
+    if bet_amount and home_away and game_id:
         conn = mysql.connection
         curr = conn.cursor()
-        query = "INSERT INTO {league} (id, home_team, away_team, date, OU) VALUES (\"{id}\",\"{home_team}\",\"{away_team}\", \"{date}\", {OU} ) ON DUPLICATE KEY UPDATE OU={OU}, date=\"{date}\"".format( id=id, league=league, home_team=home_team, away_team=away_team, date=date, OU=OU )
-        curr.execute(query) 
+        query = "INSERT INTO bets (amount, submitted_date, user_id, type, game_id, user_username,winner_id) \
+                        VALUES  ({bet_amount}, NOW(), {user_id}, \"{type2}\", \"{game_id}\",  \"{user_username}\", {winner_id})".format( bet_amount=bet_amount, user_id=int(session['user_id']), game_id=game_id, type2=home_away, user_username=session["user_name"], winner_id=winner_id )
+
+        curr.execute( query )
         conn.commit()
+        
+    else:
+        return {'status':'fail'}
+    return redirect( "feed" )
 
-        print("inserted")
 
-
-@app.route( '/get-games', methods=['GET'] )
-def get_games():
-    league = request.args.get("league")
-    #games = get_odds(league)
-    #insert_games(league, games, 'OU' )
+@app.route("/scores")
+def scores():
     conn = mysql.connection
     curr = conn.cursor()
-    query = "SELECT id, home_team, away_team, DATE_FORMAT(date,'%y-%m-%d'), OU FROM {league} where date > CURDATE() order by date desc limit 10".format(league=request.args['league'])  
+    query = "SELECT  home_team, away_team, DATE_FORMAT(date,'%m-%d'), home_score, away_score FROM games order by date"
+    curr.execute(query)
+    games = curr.fetchall()
+    print(games)
+    return render_template( 'scores.html', games=games)
+
+def get_games():
+    conn = mysql.connection
+    curr = conn.cursor()
+    query = "SELECT  home_team, away_team, DATE_FORMAT(date,'%m-%d'), home_team_moneyline, away_team_moneyline, id, home_team_id, away_team_id FROM games where date > CURDATE() order by date  limit 10"
     curr.execute(query)
     data = curr.fetchall()
     if not data:
         abort(500)
-    return {'success':data }
+    return data
    
 
 @app.route( '/like/<bet_id>', methods=['POST'])
@@ -407,7 +405,6 @@ def like(bet_id):
                   select bet_id, user_id from bets  where bet_id=%s and user_id=%s " \
                 ,(bet_id, session['user_id'], bet_id, session['user_id'],) )
     data = curr.fetchall()
-    print(data)
     if len(data) > 0: 
         abort(405)
     
@@ -454,8 +451,7 @@ def logout():
 
 
 if __name__== "__main__":
-    app.run(port=5002, host="0.0.0.0")
+    app.run(port=8000, host="0.0.0.0")
 
 
-# 0 7 * * * 7:00am everyday
 

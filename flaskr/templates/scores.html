@@ -1,0 +1,54 @@
+{% extends "header.html" %}
+
+{% block body %}
+
+<!-- <h1>this will be the main homepage</h1> -->
+<div class="img">
+<img src={{url_for('static', filename='mfl_banner.jpg')}} alt="Welcome to Gambler's Paradise!" style="width:100%" class="center">
+</div>
+<br>
+<div class="container">
+    <div class="rankings">
+        <h2>Scores</h2>
+        <table class="center">
+        <tr>
+            <th>Home Team</th>
+            <th>Away Team</th>
+            <th>Date</th>
+            <th>Home Score</th>
+            <th>Away Score</th>
+
+        </tr>
+        
+            {% for game in games %}
+            <tr>
+                <td><a href="/game/{{game[0]}}">{{game[0]}}</a></td>
+                <td><a href="/game/{{game[1]}}">{{game[1]}}</a></td>
+                <td>{{game[2]}}</td>
+                <td>{{game[3]}}</td>
+                <td>{{game[4]}}</td>
+            </tr>
+            {% endfor %}
+    
+        </table>
+    </div>
+
+ 
+</div>
+
+
+<style>
+    table{
+        border-collapse:collapse;
+        border:1px solid black;
+    }
+    table td{
+        border:1px solid black;
+    }
+
+</style>
+
+
+
+{% endblock  %}
+

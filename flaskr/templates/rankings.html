@@ -1,0 +1,204 @@
+{% extends "header.html" %}
+
+{% block body %}
+
+<!-- <h1>this will be the main homepage</h1> -->
+<div class="img">
+<img src={{url_for('static', filename='mfl_banner.jpg')}} alt="Welcome to Gambler's Paradise!" style="width:100%" class="center">
+</div>
+<br>
+<div class="container">
+    <div class="rankings">
+        <h2>Current Rankings</h2>
+        <table class="center">
+        <tr>
+            <th>Team</th>
+            <th>W</th>
+            <th>L</th>
+            <th>PF</th>
+            <th>PA</th>
+
+        </tr>
+        
+            {% for team in teams %}
+            <tr>
+                <td><a href="/team/{{team[0]}}">{{team[0]}}</a></td>
+                <td>{{team[1]}}</td>
+                <td>{{team[2]}}</td>
+                <td>{{team[3]}}</td>
+                <td>{{team[4]}}</td>
+            </tr>
+            {% endfor %}
+    
+        </table>
+    </div>
+<div class="luch">
+  <h2 style="align-self: center;">Luch's Weekly Rankings</h2> <br>
+  WEEKLY RECAP: –SOUTH BEND– It is often said that when one door closes, another one opens. This
+was certainly the case last week in South Bend, as we watched the curtain close on another NFL season
+and rang in opening night of the 2nd MFL Season. The stars were out in full force in the Green Room for
+our first MFL Draft Event (hopefully of many,) as rookie hopefuls and league veterans alike were chosen
+to be the cornerstones of their new franchises. Despite being just hours into its infancy, the sophomore
+season for the MFL is hardly short on headlines, with early league favorites rising to the top of rankings,
+potential cellar dwellers crashing towards the bottom, and chips being formed on the shoulders of multiple
+stars feeling snubbed with their draft positioning Thursday night. All of this being said, it’s time to get
+down to business and do what we do best…rank people… Without further ado, this year’s first edition of
+the MFL Power Rankings.
+<br><br>
+7: South Bend Supply Chainers (Captain Luke Bormann): With undoubtedly one of the more talented
+captain/right hand man combinations in the league in Luke Bormann and Moses Rogers, the on paper
+bright spots may end right there for the Supply Chainers. After selecting an RB QB in round 1, the Chain
+Gang may have trouble moving those chains, after failing to get their QB a receiving target in round 2
+(opting for DB Carro Follins). Notorious league sleeper and 16th overall pick Nate Bennett will help on that
+front, however. The real issue here however could be team chemistry. If Mark Laboe’s Instagram is any
+hint, this may already be the case, as the fourth-round pick shared snaps from his big night along with the
+hashtag “FreeMe” sparking controversy in league circles. Outside of roommate pairing Bormann and Jake
+Lair, this seems to be a group of individuals with no apparent relation to each other forming a team unit
+about as stable as the boat Phil Swift keeps together with Flex Tape. Much like the actual South Bend
+Supply Chain, this is an easy pick to fade here.
+<br><br>
+6. Mishawaka Little Cats (Captain Nick Moawad): Familiar territory here for Captain Nick Moawad who
+helped win a mid-season QB battle last season and lead the Mishawaka Big Cats to a title after being
+ranked 6th in these same rankings. However, Nick Hiel isn’t walking through that door this year. Playing
+for the first time in a while without henchmen Nate Goodwin Kelly and Sean Mullen, we’ll see if Moawad’s
+team success of late (2 straight rings) has been due in large part to himself or been more of a sum of its
+parts. The real issue with the team here is its risk factor. They say availability is the best ability, and with
+Paul Baynes (a self admitted attendance question mark) as your first round pick and Ian “the Invisible
+Man” Sykes surprisingly coming in during round 2, availability may be the only ability absent for the cats.
+3rd year vet Brennan Horvath returning to the gridiron could be an underrated pickup, alongside shock
+11th round pick Jack Garber. Notorious glue guy and underrated defensive presence, Braden Handloser,
+was taken in the 6th round (37th overall,) a slot a tad bit higher than his ACT score (Braden took the ACT
+last week, have you guys heard???). Great captain, decent guy, but I’m a bit worried for Moawad here.
+<br><br>
+5. The Pied Pipers (Captain Ryan McCann): A fifth round pick last year, perhaps nobody’s MFL stock has
+risen higher than that of Captain Ryan McCann. McCann set the world on fire last season, the lone bright
+spot in a cursed Smicks’ Patio campaign. Once again paired with roommate and right-hand man,
+Marcello Nanni (4th overall,) Ryan and the Pied Pipers have what I’d go as far as to say is the best 1-2
+punch in the game. The next two picks for McCann have also been getting rave reviews, as perennial
+sleeper Nick Grimes, and promising MFL rookie Chuck Schmidt (rounds 2 and 3) round out a menacing
+top 4. One has to assume 25th overall pick, Laroi, will be under center, a pick that could go either way, as
+the second year QB may have the best arm talent in the game but also possesses a worryingly obvious
+inability to read coverages. This leaves sneaky good receiving option, Troy Johnson, competing for
+offensive snaps and likely playing defense, which certainly is not his best side of the ball. With 3 RAs on
+the squad, but all taken relatively late in the draft, it’ll be interesting to see if McCann gives them their
+deserved farewell tour with key roles in either starting unit or lets the veterans rot on the bench in favor of
+the younger and earlier round talent on the roster. outside looking in of the top 3…for now…
+<br><br>
+4. Fourth Quarter Dawgs (Captain Sean O’Connor): One of two returning captains (Ryan Ford,) Sean O’
+Connor too finds himself in the same spot as he did about a year ago. Ranked 4th last year, OC, took a
+page from the Last Dance era and “took that personally” stoking the flames of the fire of a playoff run that
+came up a few rounds short. Ranked at 4th again this year, we’ll see if it ends with a different story. Unlike
+last year (just 6 teams, teams were more uneven) being ranked at 4 this year is by no means a slight, as
+the rosters are just hairs apart. There are honestly bright spots all over this roster: a seemingly motivated 
+Nick Reece leading the charge, steady QB play with Trevor Kelly, Ryan Quan (19) and Joe Sang (52)
+with the potential to be two of the bigger steals in the draft, and former Smicks Patio man Justin Share
+(24) providing the vertical threat and breaking my heart doing it for a different team. The only issue I really
+have with the team is its ceiling. OC went pretty risk free, and in doing so I expect him to be a top 3 seed
+at the least come playoff time, but does this roster have the dynamic nature and explosiveness required
+of a 3 game winning streak in the gauntlet that is MFL playoff season? All questions we must wait to find
+out, but for now fans and management alike can sleep well at night knowing the roster is deep and
+reliable.<br><br>
+3. Rockne Rockets (Captain Logan Stucke): Long one of the lightning rods of controversy in Manor
+Football affairs, the youngest of the league’s captains, Logan Stucke, enters the year with high hopes for
+both himself and his team. Stucke is undoubtedly one of the better talents in the game but has never
+quite been able to get out of his own way, whether that be in terms of positioning on the field or letting
+things like Cagg’s ROY rankings get under his skin and into his head. However, this year he may have
+built a roster that can help him do just that. With fellow sophomore and top tier manor talent Sean Mullen
+on the roster as the third overall pick, not to mention a seemingly inspired Matt Kennedy and Rogba
+Ayoola along for the ride, Stucke has a core four and more that offers one of the league’s higher ceilings.
+If fourth round pick Dean Suchsland can utilize his height on the gridiron just a tad bit better than he does
+while playing fours at The Rock, then this might be the best top 5 in the game. It’ll be interesting to see if
+former Rocket captain Matt Scheller retains his spot at QB, or if Stucke opts to take the snaps under
+center in favor of getting the entirety of a potentially elite receiving corps out onto the field. With an
+abundance of youth from the later rounds, notably Mike “39 Mistakes” Stautz, eager to prove their worth it
+will be interesting to see how Stucke balances the egos in the room and the product on the field. Talent is
+there, lets see if the management is too. Easy top 3 selection.
+<br><br>
+2. Smicks’ Patio (Captains: Thomas Luciano and Ryan Ford): I know, I know, its probably ridiculous that
+Smicks’ Patio is ranked here. And by that I mean we should probably be taking home the top slot in the
+rankings, but for now #2 will have to do. In all seriousness, I do truly believe in this roster. Neither myself
+nor Ryan is making a case for the most valuable captain, but together we add up to something of some
+note, and with easily the most dynamic physical talent in the game (NevaLoss Watson) even a mediocre
+draft would have set this team up for reasonable success. Every successful franchise needs its
+hometown hero and former St Joe Indian, Matt Egan, is looking to be just that and live up to the lofty
+expectations that come with the 14th overall pick. The rare glue guy/productivity hybrid exists on this
+roster in the form of NGK, a surprise 3rd round selection after being ranked as low as 43 on Ahmed’s big
+boards. The Patio went for ceiling over floor, opting for mostly underclassmen with notorious chain mover
+Iain Jahns and Jack Schlehr being the only upperclassmen left on the roster. Depth is the strong suit here
+with Mahoney, Melgarejo, Chromy, and Tsegaw rounding out the middle rounds of a roster that should
+have no problem fielding a strong team on either side of the ball, not to mention the Loyola product John
+Soza. Look for the Patio to be in the Super Bowl this year. Guaranteed.<br><br>
+1.Norwegian Anchovies (Captain: John Kuntz): Now first of all this ranking is probably a moot point, as we
+all know Kuntz is simply incapable of making it past the second round, however, if that is ever to happen
+this surely should be the year. The most valuable of team captains, the reigning league MVP got to work
+with his wraparound picks, taking Jack Galassi and Jesse Salazar to form a Big 3 in every sense of the
+term. Counteracting this sheer mass are the change of pace selections of rounds 3 and 4 (Luke
+Hinsmann and Trevor Komeiji), not to mention a potential steal with one of the league’s premier
+speedsters in Alex Nordlinger. Kuntz checked senior leadership off of his list with the selections of Travis
+Williams and Connor “the Woz” Wozniak, 2 relative unknowns in terms of value, but high character guys
+for that room. Honestly even the “depth” picks of the later rounds could fight for minutes on some rosters
+and be real contributors on this team. Overall it’s a really strong squad, if there’s any reason to worry it
+would be chemistry and availability. There isn’t much meshing of friend groups/classes here which could
+always be a concern if the inevitable MFL rough patch presents itself. Lets see how Kuntz handles it.
+WAIVER WIRE WATCHLIST
+1/1: JustTheTip: Who is going to take the dip on the tip???
+
+</div>
+ 
+</div>
+
+
+
+<style>
+    table{
+      border-radius: 5px;
+      border-collapse:collapse;
+      border:1px solid black;
+      width:100%;
+    }
+    table td{
+        border:1px solid black;
+        padding: 5px;
+    }
+    table th{
+      border:1px solid black;
+      margin: 5px;
+  }
+    tbody{
+      text-align: center;
+    }
+    .b{
+      background-color: dodgerblue; 
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      width: max-content;
+      padding: 10px;
+    }
+    .img{
+      background-color: white;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+    }
+    .rankings{
+        font-size: large;
+    }
+    h2{
+      align-self: center;
+    }
+   
+    
+    
+
+
+</style>
+
+
+{% endblock  %}
+

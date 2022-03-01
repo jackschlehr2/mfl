@@ -4,42 +4,54 @@
 
 <!-- <h1>this will be the main homepage</h1> -->
 <div class="img">
-<img src="https://production.listennotes.com/podcasts/gamblers-paradise-fRwzZUEL_b1-Tczl16baZUJ.1400x1400.jpg" alt="Welcome to Gambler's Paradise!" style="max-width:450px;max-height:400px;height:100%;width:100%" class="center">
+<img src={{url_for('static', filename='mfl_banner.jpg')}} alt="Welcome to Gambler's Paradise!" style="width:100%" class="center">
 </div>
 <br>
 
-<div class="hello">
-  <h2 style="align-self: center;">Hello,</h2> <br>
-  <p>If you're on this website, it's probably because we have something in common. Namely, you have a love for (read: addiction to) gambling. Well, you're in the right place! Welcome to Gambler's Paradise, a place where you can connect with the finest minds in the sports gambling universe and bask in the glory that is degeneracy!
-    <br> <br>
-    To learn more about the functionality we can offer you, click the 'Learn More' button. To check out the most recent bets made by users, click the 'See What's Up' button. Happy gambling!!!
-  </p>
-  <a href="/features" ><button type="button" class="btn btn-primary">Learn More</button></a>
-  <a href="/feed" ><button type="button" class="btn btn-primary">See What's Up</button></a>
-</div>
-<div class="center">
-  <h2>Find friends</h2>
-<table class="center">
-<tr>
-    <th>Username</th>
-    <th>View Profile</th>
-    <th>AddFriend</th>
-  </tr>
-  
-    {% for user in users %}
-      <tr>
-          <td>{{user[0]}}</td>
-          <td><a href="/profile/{{user[0]}}"><button class="btn btn-sm btn-primary btn-block">View Profile</button></a></td>
-          <td><button onclick="addfriend( '/add-friend/{{user[0]}}')" class="btn btn-sm btn-primary btn-block" id="add-friend">Add Friend</button></td>
-      </tr>
-    {% endfor %}
 
-</table>
+<div class="container">
+  
+  <div class="center">
+    <h2>Current Rankings</h2>
+  <table class="center">
+  <tr>
+      <th>Team</th>
+      <th>W</th>
+      <th>L</th>
+      <th>PF</th>
+      <th>PA</th>
+
+    </tr>
+    
+      {% for team in teams %}
+        <tr>
+            <td><a href="/team/{{team[0]}}">{{team[0]}}</a></td>
+            <td>{{team[1]}}</td>
+            <td>{{team[2]}}</td>
+            <td>{{team[3]}}</td>
+            <td>{{team[4]}}</td>
+        </tr>
+      
+      {% endfor %}
+  </table>
+  </div>
+  <div class="hello">
+    <h2 style="align-self: center;">Hello,</h2> <br>
+    <p>If you're on this website, it's probably because we have something in common. Namely, you have a love for (read: addiction to) gambling. Well, you're in the right place! Welcome to Gambler's Paradise, a place where you can connect with the finest minds in the sports gambling universe and bask in the glory that is degeneracy!
+      <br> <br>
+      To learn more about the functionality we can offer you, click the 'Learn More' button. To check out the most recent bets made by users, click the 'See What's Up' button. Happy gambling!!!
+    </p>
+    <a href="/feed" ><button type="button" class="btn btn-primary">See What's Up</button></a>
+  </div>
 </div>
 
 
 
 <style>
+    .container{
+      display: flex;
+      flex-wrap: wrap;
+    }
     th, td{
     border:1px solid black;
     }
@@ -72,9 +84,6 @@
       font-family: 'Helvetica Neue';
     }
     .hello{
-      display: inline-block;
-      float: left;
-      width: 50%;
       margin-left: 50px;
       font-family: 'Helvetica Neue';
     }
@@ -91,22 +100,6 @@
 
 
 </style>
-<script>
-  function addfriend(url){
-    console.log(url)
-    $.ajax({
-      
-      type: "POST",
-      url: url,
-      success: function(data) {
-        console.log(data);
-      },
-      error: function(data){
-        console.log(data);
-      }
-    });
-  };
-</script>
 
 {% endblock  %}
 

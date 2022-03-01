@@ -1,4 +1,4 @@
-# gamblersparadise
+# mfl
 to turn debug mode on type `export FLASK_ENV=development` <br />
 
 ## Accessing Server
